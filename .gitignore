@@ -1,0 +1,8 @@
+# Web Game Junk
+node_modules/
+dist/
+*.log
+test-logic.js
+
+# Large Assets
+public/assets/
