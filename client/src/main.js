@@ -1,15 +1,11 @@
 import './style.css'
 import { Visuals } from './visuals.js'
-import { Board } from './game-logic.js'
+import { Board, ROWS, COLS } from '../../shared/game-logic.js'
 import { AI } from './ai.js'
 import { NetworkManager } from './network.js'
 import { AudioManager } from './audio.js'
 
 console.log("Connect Four 2026 Initializing...")
-
-// Constants
-const ROWS = 6
-const COLS = 7
 
 const audioManager = new AudioManager()
 const visuals = new Visuals(ROWS, COLS, audioManager)

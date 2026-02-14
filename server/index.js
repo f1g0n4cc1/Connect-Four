@@ -1,7 +1,7 @@
-const WebSocket = require('ws');
-const { GameState } = require('./game-state');
+import { WebSocketServer, WebSocket } from 'ws';
+import { GameState } from './game-state.js';
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocketServer({ port: 8080 });
 
 const rooms = new Map(); // code -> { gameState, players: [ws1, ws2], spectators: [] }
 
