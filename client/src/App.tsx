@@ -3,9 +3,10 @@ import { useGameStore } from './store/useGameStore';
 import { MainMenu } from './components/MainMenu';
 import { OnlineLobby } from './components/OnlineLobby';
 import { RoomWait } from './components/RoomWait';
+import { GameScene } from './components/Three/Scene';
 
 const App: React.FC = () => {
-    const { gameMode } = useGameStore();
+    const { gameMode, setGameMode, resetLocalGame } = useGameStore();
 
     // Determine what to show in the overlay
     const renderOverlay = () => {
@@ -25,25 +26,21 @@ const App: React.FC = () => {
 
     return (
         <div className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-[#121212]">
-            {/* Game Background Scene (Phase 4) */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                <div className="text-zinc-800 text-9xl font-black rotate-[-10deg] select-none">
-                    CONNECT FOUR
-                </div>
-            </div>
+            {/* 3D Game Scene */}
+            <GameScene />
 
-            {/* Main Game Interface (Placeholder for Phase 4) */}
+            {/* In-Game UI Controls */}
             {!isOverlayOpen && (
-                <div className="z-0 flex flex-col items-center gap-8">
-                   <div className="text-white text-2xl font-bold animate-pulse">
-                        Game Scene Loading... (Phase 4 Implementation)
-                   </div>
-                   <button 
-                    onClick={() => window.location.reload()}
-                    className="text-zinc-500 hover:text-white underline"
-                   >
-                    Quit to Menu (Reload)
-                   </button>
+                <div className="absolute top-8 left-8 z-10">
+                    <button 
+                        onClick={() => {
+                            setGameMode('menu');
+                            resetLocalGame();
+                        }}
+                        className="bg-zinc-900/50 hover:bg-zinc-800 backdrop-blur-md text-white px-4 py-2 rounded-lg border border-white/10 transition-all"
+                    >
+                        ← BACK TO MENU
+                    </button>
                 </div>
             )}
 
