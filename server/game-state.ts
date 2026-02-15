@@ -1,21 +1,39 @@
-import { Board } from '../shared/game-logic.js';
+import { Board, Player, Position } from '@connect-four/shared';
+
+export interface MoveResult {
+    valid: boolean;
+    reason?: string;
+    row?: number;
+    winner?: Player | null;
+    isDraw?: boolean;
+    nextTurn?: Player;
+    winningLine?: Position[] | false;
+}
 
 export class GameState {
-    constructor(rows = 6, cols = 7) {
+    board: Board;
+    rows: number;
+    cols: number;
+    turn: Player;
+    winner: Player | null;
+    isDraw: boolean;
+    winningLine: Position[] | null;
+
+    constructor(rows: number = 6, cols: number = COLS_DEFAULT) {
         this.board = new Board(rows, cols);
         this.rows = rows;
         this.cols = cols;
-        this.turn = 1; // 1 or 2
+        this.turn = 1;
         this.winner = null;
         this.isDraw = false;
         this.winningLine = null;
     }
 
-    get columns() {
+    get columns(): Player[][] {
         return this.board.columns;
     }
 
-    playMove(col, player) {
+    playMove(col: number, player: Player): MoveResult {
         if (this.winner || this.isDraw) return { valid: false, reason: 'Game Over' };
         if (player !== this.turn) return { valid: false, reason: 'Not your turn' };
         
@@ -36,3 +54,5 @@ export class GameState {
         }
     }
 }
+
+const COLS_DEFAULT = 7;
