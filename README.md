@@ -7,26 +7,26 @@ A modern, web-based Connect Four game with a high-fidelity 3D aesthetic, built o
 ## Features
 
 *   **Multiple Game Modes:**
-    *   **Single Player vs. AI:** Play against an AI with improved minimax heuristics.
+    *   **Single Player vs. AI:** Play against an AI with improved minimax heuristics and window-based evaluation.
     *   **Local PvP (Hotseat):** Play against a friend on the same machine.
     *   **Online Multiplayer (PvP):** Create or join private game rooms using a 4-digit code.
 *   **High-Fidelity 3D Interface:**
-    *   Rendered with **Three.js** and **React Three Fiber** for realistic depth and lighting.
+    *   Rendered with **Three.js** and **React Three Fiber** for realistic depth, shadows, and lighting.
     *   Tactile wooden board with physics-based piece drop animations (gravity and bounce).
-    *   Interactive camera with smooth controls.
+    *   Interactive cinematic camera with smooth controls.
 *   **Modern UI/UX:**
     *   Declarative UI built with **React** and **Tailwind CSS**.
     *   Reactive state management powered by **Zustand**.
-    *   Glowing highlights for winning pieces and cinematic victory banners.
+    *   Responsive design with modern glassmorphism overlays.
 *   **Robust Online Play:**
-    *   Real-time communication via **Socket.io** with automatic reconnection.
-    *   Scalable backend architecture ready for horizontal scaling with **Redis**.
+    *   Real-time communication via **Socket.io** with automatic reconnection and room persistence.
+    *   Scalable backend architecture powered by **Fastify 5** and **Redis**.
 
 ## Technologies Used
 
-*   **Frontend:** React 18, Three.js, React Three Fiber, Zustand, Tailwind CSS, Vite.
-*   **Backend:** Node.js, Fastify, Socket.io, TypeScript, Redis.
-*   **Shared Logic:** Pure TypeScript library shared across the monorepo.
+*   **Frontend:** React 18, Three.js, React Three Fiber (R3F), Zustand, Tailwind CSS, Vite 6.
+*   **Backend:** Node.js (v24+), Fastify 5, Socket.io 4, TypeScript, Redis.
+*   **Shared Logic:** Pure TypeScript library shared across all workspaces.
 *   **DevOps:** Docker, Playwright (E2E Testing), Vitest (Unit Testing).
 
 ## Project Structure
@@ -35,25 +35,28 @@ The project uses a monorepo structure with npm workspaces:
 
 ```
 /
-├── client/         # React Frontend (Vite + R3F)
+├── client/                 # React Frontend (Vite + R3F)
 │   ├── src/
-│   │   ├── components/     # React & Three.js components
+│   │   ├── components/     # React components & 3D Scene
 │   │   ├── store/          # Zustand game store
-│   │   └── main.tsx        # Entry point
+│   │   ├── App.tsx         # Main layout orchestrator
+│   │   └── main.tsx        # React entry point
 │   └── Dockerfile
-├── server/         # Fastify + Socket.io Backend
-│   ├── index.ts            # Server entry point
-│   ├── game-state.ts       # Server-side room logic
+├── server/                 # Fastify + Socket.io Backend
+│   ├── index.ts            # Server entry point & Socket handlers
+│   ├── game-state.ts       # Room and game-state logic
 │   └── Dockerfile
-└── shared/         # Shared TypeScript library
+└── shared/                 # Shared TypeScript logic & types
+    ├── ai.ts               # Minimax AI implementation
     ├── game-logic.ts       # Core Board class and win detection
-    └── types.ts            # Standardized network schemas
+    ├── types.ts            # Standardized network message schemas
+    └── index.ts            # Package entry point
 ```
 
 ## How to Run
 
 ### 1. Prerequisite
-Ensure you have Node.js (v20+) installed. For online play persistence, a local Redis instance is recommended but not required (falls back to in-memory).
+Ensure you have Node.js (v20+) installed. A local Redis instance is recommended for production-grade room persistence but not required for development (falls back to in-memory).
 
 ### 2. Installation
 Install all dependencies for the entire monorepo from the root:
@@ -63,29 +66,28 @@ npm install
 ```
 
 ### 3. Development
-Start both the server and the client simultaneously:
+Start the server and the client simultaneously in development mode:
 
 ```bash
-# Run both workspaces in dev mode
+# Run all workspaces in dev mode
 npm run dev --workspaces
 ```
 
-Alternatively, run them individually:
-```bash
-npm run dev -w @connect-four/server
-npm run dev -w @connect-four/client
-```
-
 ### 4. Testing
-Run unit tests for shared logic and AI:
+Run the test suite to verify shared logic and AI performance:
 ```bash
 npm test
 ```
 
 ## Docker Deployment
-Build and run the entire stack using Docker:
+The project is fully Dockerized for consistent deployment across environments.
+
 ```bash
-# Example for server
+# Build and run the server
 docker build -t connect4-server -f server/Dockerfile .
 docker run -p 8080:8080 connect4-server
+
+# Build and run the client (Nginx)
+docker build -t connect4-client -f client/Dockerfile .
+docker run -p 80:80 connect4-client
 ```
