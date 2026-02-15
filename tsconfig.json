@@ -10,8 +10,9 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@connect-four/shared": ["shared/game-logic.ts"]
+      "@connect-four/shared": ["shared/index.ts"]
     }
   },
-  "exclude": ["node_modules"]
+  "include": ["shared/**/*.ts", "client/src/**/*", "server/**/*.ts"],
+  "exclude": ["node_modules", "**/dist"]
 }

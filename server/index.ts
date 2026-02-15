@@ -46,7 +46,7 @@ function generateRoomCode() {
     return Math.random().toString(36).substring(2, 6).toUpperCase();
 }
 
-fastify.register(socketio, {
+fastify.register(socketio as any, {
     cors: {
         origin: '*', // In production, restrict this
     }
@@ -55,7 +55,7 @@ fastify.register(socketio, {
 fastify.ready(err => {
     if (err) throw err;
 
-    const io: Server = fastify.io;
+    const io: Server = (fastify as any).io;
 
     io.on('connection', (socket: Socket) => {
         let sessionId = socket.handshake.query.sessionId as string;

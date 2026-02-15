@@ -1,4 +1,4 @@
-import { Board, Player, Position } from '@connect-four/shared';
+import { Board, Player, Position, COLS, ROWS } from '@connect-four/shared';
 
 export interface MoveResult {
     valid: boolean;
@@ -19,7 +19,7 @@ export class GameState {
     isDraw: boolean;
     winningLine: Position[] | null;
 
-    constructor(rows: number = 6, cols: number = COLS_DEFAULT) {
+    constructor(rows: number = ROWS, cols: number = COLS) {
         this.board = new Board(rows, cols);
         this.rows = rows;
         this.cols = cols;

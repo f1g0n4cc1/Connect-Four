@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useGameStore } from './store/useGameStore';
 import { MainMenu } from './components/MainMenu';
 import { OnlineLobby } from './components/OnlineLobby';

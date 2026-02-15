@@ -1,10 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Board, ROWS, COLS } from '../../shared/game-logic.js';
-import { AI } from './ai.js';
+import { Board, ROWS, COLS, AI } from '@connect-four/shared';
 
 describe('AI Class', () => {
-    let board;
-    let ai;
+    let board: Board;
+    let ai: AI;
 
     beforeEach(() => {
         board = new Board(ROWS, COLS);

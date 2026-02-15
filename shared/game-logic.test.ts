@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Board, ROWS, COLS } from './game-logic.js';
+import { Board, ROWS, COLS } from './index.js';
 
 describe('Board Class', () => {
-    let board;
+    let board: Board;
 
     beforeEach(() => {
         board = new Board(ROWS, COLS);
@@ -46,7 +46,7 @@ describe('Board Class', () => {
             const row = board.playMove(3, 1);
             const win = board.checkWin(3, row, 1);
             expect(win).toBeTruthy();
-            expect(win.length).toBe(4);
+            if (win) expect(win.length).toBe(4);
         });
 
         it('should detect vertical wins', () => {
@@ -56,7 +56,7 @@ describe('Board Class', () => {
             const row = board.playMove(0, 1);
             const win = board.checkWin(0, row, 1);
             expect(win).toBeTruthy();
-            expect(win.length).toBe(4);
+            if (win) expect(win.length).toBe(4);
         });
 
         it('should detect diagonal wins (/)', () => {
@@ -81,7 +81,7 @@ describe('Board Class', () => {
 
             const win = board.checkWin(3, row, 1);
             expect(win).toBeTruthy();
-            expect(win.length).toBe(4);
+            if (win) expect(win.length).toBe(4);
         });
 
         it('should detect diagonal wins (\)', () => {
@@ -106,7 +106,7 @@ describe('Board Class', () => {
 
             const win = board.checkWin(0, row, 1);
             expect(win).toBeTruthy();
-            expect(win.length).toBe(4);
+            if (win) expect(win.length).toBe(4);
         });
     });
 
