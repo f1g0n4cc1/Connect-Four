@@ -54,7 +54,7 @@ export const Board: React.FC = () => {
                 castShadow 
                 position={[0, 0, -0.2]} // Center the 0.4 depth at Z=0
             >
-                <meshStandardMaterial color="#3d2b1f" roughness={0.4} metalness={0.2} />
+                <meshStandardMaterial color="#16213e" roughness={0.4} metalness={0.2} />
             </mesh>
 
             {/* Interaction Hitboxes (with Hover feedback) */}
