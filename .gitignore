@@ -6,3 +6,6 @@ test-logic.js
 
 # Large Assets
 public/assets/
+
+# AI assistant
+.gemini
