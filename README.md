@@ -29,6 +29,12 @@ A modern, web-based Connect Four game with a high-fidelity 3D aesthetic, built o
 *   **Shared Logic:** Pure TypeScript library shared across all workspaces.
 *   **DevOps:** Docker, Playwright (E2E Testing), Vitest (Unit Testing).
 
+## Compatibility
+This project is **fully cross-platform** and supports:
+*   **macOS** (Intel and Apple Silicon)
+*   **Windows** (10/11)
+*   **Linux** (Ubuntu, Fedora, etc.)
+
 ## Project Structure
 
 The project uses a monorepo structure with npm workspaces:
