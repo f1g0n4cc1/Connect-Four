@@ -42,7 +42,7 @@ export const MainMenu: React.FC = () => {
                 className="bg-blue-900 text-white py-3 px-6 rounded-lg shadow-lg hover:scale-105 transition-transform"
                 onClick={handleOnlineClick}
             >
-                Play Online
+                Play Online (Coming soon!)
             </button>
         </div>
     );
