@@ -1,0 +1,25 @@
+{
+  "name": "connect-four",
+  "version": "1.0.0",
+  "description": "A modern, web-based Connect Four game with a tactile 3D aesthetic, built on a client-server architecture. It features real-time online multiplayer, a challenging AI opponent, and local \"hotseat\" play.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/f1g0n4cc1/Connect-Four.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/f1g0n4cc1/Connect-Four/issues"
+  },
+  "homepage": "https://github.com/f1g0n4cc1/Connect-Four#readme",
+  "devDependencies": {
+    "vitest": "^4.0.18"
+  }
+}
