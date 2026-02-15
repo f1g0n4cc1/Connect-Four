@@ -70,7 +70,16 @@ Start the server and the client simultaneously in development mode:
 
 ```bash
 # Run all workspaces in dev mode
-npm run dev --workspaces
+npm run dev
+```
+
+*   **Client:** [http://localhost:5173](http://localhost:5173) (The React UI)
+*   **Server:** [ws://localhost:8080](ws://localhost:8080) (The Backend)
+
+Alternatively, run them individually:
+```bash
+npm run dev -w @connect-four/server
+npm run dev -w @connect-four/client
 ```
 
 ### 4. Testing

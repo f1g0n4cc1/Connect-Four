@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGameStore } from '../../store/useGameStore';
 import { COLS, ROWS } from '@connect-four/shared';
 
 export const Board: React.FC = () => {
     const { makeMove } = useGameStore();
+    const [hoveredCol, setHoveredCol] = useState<number | null>(null);
 
     return (
         <group>
@@ -13,7 +14,7 @@ export const Board: React.FC = () => {
                 <meshStandardMaterial color="#3d2b1f" roughness={0.3} metalness={0.1} />
             </mesh>
 
-            {/* Interaction Hitboxes (Invisible) */}
+            {/* Interaction Hitboxes (with Hover feedback) */}
             {Array.from({ length: COLS }).map((_, c) => (
                 <mesh 
                     key={`hitbox-${c}`}
@@ -22,13 +23,19 @@ export const Board: React.FC = () => {
                         e.stopPropagation();
                         makeMove(c);
                     }}
+                    onPointerOver={() => setHoveredCol(c)}
+                    onPointerOut={() => setHoveredCol(null)}
                 >
                     <boxGeometry args={[0.9, ROWS, 0.1]} />
-                    <meshBasicMaterial transparent opacity={0} />
+                    <meshBasicMaterial 
+                        transparent 
+                        opacity={hoveredCol === c ? 0.1 : 0} 
+                        color="white" 
+                    />
                 </mesh>
             ))}
 
-            {/* Visual Holes (Simplified for now - can use CSG for real holes later) */}
+            {/* Visual Holes */}
             {Array.from({ length: COLS }).map((_, c) => (
                 Array.from({ length: ROWS }).map((_, r) => (
                     <mesh 

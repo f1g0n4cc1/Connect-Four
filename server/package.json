@@ -11,7 +11,7 @@
   "dependencies": {
     "@connect-four/shared": "*",
     "fastify": "^5.7.4",
-    "fastify-socket.io": "^5.1.0",
+    "fastify-socket.io": "^4.0.0",
     "ioredis": "^5.3.3",
     "socket.io": "^4.7.4"
   },

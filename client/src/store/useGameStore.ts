@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Player, Position, GameStatePayload } from '@connect-four/shared';
+import { Player, Position, GameStatePayload, Board, AI, ROWS, COLS } from '@connect-four/shared';
 import { io, Socket } from 'socket.io-client';
 
 interface GameStore {
@@ -16,6 +16,8 @@ interface GameStore {
     isGameOver: boolean;
     winningLine: Position[] | null;
     connectionStatus: 'disconnected' | 'connecting' | 'connected';
+    localBoard: Board | null;
+    aiDifficulty: 'easy' | 'hard';
     
     // Actions
     connect: (url: string) => void;
@@ -25,7 +27,9 @@ interface GameStore {
     makeMove: (col: number) => void;
     requestRematch: () => void;
     setGameMode: (mode: GameStore['gameMode']) => void;
+    setAiDifficulty: (diff: 'easy' | 'hard') => void;
     resetLocalGame: () => void;
+    initLocalGame: () => void;
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -34,13 +38,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     roomCode: localStorage.getItem('connect4_roomCode'),
     playerIndex: null,
     gameMode: 'menu',
-    board: [],
+    board: Array(COLS).fill(null).map(() => []),
     currentPlayer: 1,
     winner: null,
     isDraw: false,
     isGameOver: false,
     winningLine: null,
     connectionStatus: 'disconnected',
+    localBoard: null,
+    aiDifficulty: 'easy',
 
     connect: (url) => {
         if (get().socket?.connected) return;
@@ -114,25 +120,84 @@ export const useGameStore = create<GameStore>((set, get) => ({
     },
 
     makeMove: (col) => {
-        const { gameMode, socket } = get();
+        const { gameMode, socket, localBoard, currentPlayer, isGameOver } = get();
+        
+        if (isGameOver) return;
+
         if (gameMode === 'pvp') {
             socket?.emit('make_move', { col });
+            return;
         }
-        // Local logic will be handled by the game component or a separate hook
+
+        if (localBoard) {
+            if (!localBoard.isValidMove(col)) return;
+
+            const row = localBoard.playMove(col, currentPlayer);
+            const winResult = localBoard.checkWin(col, row, currentPlayer);
+            const isDraw = localBoard.checkDraw();
+
+            set({
+                board: [...localBoard.columns],
+                winner: winResult ? currentPlayer : null,
+                winningLine: winResult || null,
+                isDraw: !!isDraw && !winResult,
+                isGameOver: !!winResult || !!isDraw,
+                currentPlayer: currentPlayer === 1 ? 2 : 1
+            });
+
+            // AI Turn
+            const updatedState = get();
+            if (gameMode === 'pve' && !updatedState.isGameOver && updatedState.currentPlayer === 2) {
+                setTimeout(() => {
+                    const ai = new AI(localBoard);
+                    const aiCol = ai.getBestMove(2, updatedState.aiDifficulty);
+                    get().makeMove(aiCol);
+                }, 600);
+            }
+        }
     },
 
     requestRematch: () => {
         get().socket?.emit('request_rematch');
     },
 
-    setGameMode: (mode) => set({ gameMode: mode }),
+    setGameMode: (mode) => {
+        set({ gameMode: mode });
+        if (['pve', 'pve-local'].includes(mode)) {
+            get().initLocalGame();
+        }
+    },
 
-    resetLocalGame: () => set({
-        board: [],
-        currentPlayer: 1,
-        winner: null,
-        isDraw: false,
-        isGameOver: false,
-        winningLine: null
-    })
+    setAiDifficulty: (diff) => set({ aiDifficulty: diff }),
+
+    initLocalGame: () => {
+        const newBoard = new Board(ROWS, COLS);
+        set({
+            localBoard: newBoard,
+            board: Array(COLS).fill(null).map(() => []),
+            currentPlayer: 1,
+            winner: null,
+            isDraw: false,
+            isGameOver: false,
+            winningLine: null
+        });
+    },
+
+    resetLocalGame: () => {
+        const { gameMode } = get();
+        if (['pve', 'pve-local'].includes(gameMode)) {
+            get().initLocalGame();
+        } else {
+            set({
+                board: Array(COLS).fill(null).map(() => []),
+                currentPlayer: 1,
+                winner: null,
+                isDraw: false,
+                isGameOver: false,
+                winningLine: null,
+                localBoard: null
+            });
+        }
+    }
 }));
+

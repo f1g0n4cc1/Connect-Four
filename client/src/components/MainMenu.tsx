@@ -2,7 +2,12 @@ import React from 'react';
 import { useGameStore } from '../store/useGameStore';
 
 export const MainMenu: React.FC = () => {
-    const { setGameMode, connect } = useGameStore();
+    const { setGameMode, setAiDifficulty, connect } = useGameStore();
+
+    const handlePvE = (diff: 'easy' | 'hard') => {
+        setAiDifficulty(diff);
+        setGameMode('pve');
+    };
 
     const handleOnlineClick = () => {
         setGameMode('online-lobby');
@@ -17,13 +22,13 @@ export const MainMenu: React.FC = () => {
             </h1>
             <button 
                 className="bg-wood-grain text-white py-3 px-6 rounded-lg shadow-lg hover:scale-105 transition-transform"
-                onClick={() => setGameMode('pve')}
+                onClick={() => handlePvE('easy')}
             >
                 vs AI (Easy)
             </button>
             <button 
                 className="bg-wood-grain text-white py-3 px-6 rounded-lg shadow-lg hover:scale-105 transition-transform"
-                onClick={() => setGameMode('pve')}
+                onClick={() => handlePvE('hard')}
             >
                 vs AI (Hard)
             </button>
@@ -42,3 +47,4 @@ export const MainMenu: React.FC = () => {
         </div>
     );
 };
+
