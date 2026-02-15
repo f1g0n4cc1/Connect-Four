@@ -51,10 +51,13 @@ The project is organized into two main directories:
 │   │   └── audio.js        # Sound effect manager
 │   ├── index.html
 │   └── package.json
-└── server/         # Contains all the backend code
-    ├── index.js          # WebSocket server setup and message handling
-    ├── game-state.js     # Server-side game logic and state management
-    └── package.json
+├── server/         # Contains all the backend code
+│   ├── index.js          # WebSocket server setup and message handling
+│   ├── game-state.js     # Server-side game logic and state management
+│   └── package.json
+└── shared/         # Shared code between client and server
+    ├── game-logic.js     # Core Board class and win detection
+    └── game-logic.test.js
 ```
 
 ## How to Run
