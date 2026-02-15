@@ -8,6 +8,7 @@ export class GameState {
         this.turn = 1; // 1 or 2
         this.winner = null;
         this.isDraw = false;
+        this.winningLine = null;
     }
 
     get columns() {
@@ -24,6 +25,7 @@ export class GameState {
         const winResult = this.board.checkWin(col, row, player);
         if (winResult) {
             this.winner = player;
+            this.winningLine = winResult;
             return { valid: true, row, winner: this.winner, isDraw: false, nextTurn: this.turn, winningLine: winResult };
         } else if (this.board.checkDraw()) {
             this.isDraw = true;

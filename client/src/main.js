@@ -167,6 +167,16 @@ network.on('onRematchPending', () => {
   render(clientState)
 })
 
+network.on('onPlayerDisconnected', ({ playerIndex }) => {
+  console.log(`Player ${playerIndex} disconnected.`);
+  // We could show a notification here
+})
+
+network.on('onError', (message) => {
+  alert(message);
+  showMainMenu();
+})
+
 // --- Game Logic ---
 function handleGameOver(result) {
   const banner = document.getElementById('victory-screen');
