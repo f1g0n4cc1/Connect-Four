@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.gitignore
+README.md
+IMPLEMENTATION_PLAN.md
+client/node_modules
+server/node_modules
+shared/node_modules

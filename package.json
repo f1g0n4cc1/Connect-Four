@@ -10,7 +10,8 @@
     "shared"
   ],
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   },
   "homepage": "https://github.com/f1g0n4cc1/Connect-Four#readme",
   "devDependencies": {
+    "@playwright/test": "^1.42.1",
     "typescript": "^5.3.3",
     "vitest": "^4.0.18"
   }
