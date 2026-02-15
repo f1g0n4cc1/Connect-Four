@@ -1,6 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { GameState } from './game-state.js';
 import crypto from 'node:crypto';
+import { logger } from './logger.js';
 
 const wss = new WebSocketServer({ port: 8080 });
 
@@ -15,7 +16,18 @@ function generateSessionId() {
     return crypto.randomUUID();
 }
 
-console.log('Server started on port 8080');
+// Process-level error handlers
+process.on('uncaughtException', (err) => {
+    logger.error(`Uncaught Exception: ${err.message}`);
+    logger.error(err.stack);
+    // In a real production app, you might want to restart the process here
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error(`Unhandled Rejection at: ${promise} reason: ${reason}`);
+});
+
+logger.success('Connect Four Server started on port 8080');
 
 wss.on('connection', (ws) => {
     ws.sessionId = generateSessionId();
@@ -23,12 +35,14 @@ wss.on('connection', (ws) => {
     ws.playerIndex = 0; // 1 or 2
     ws.isAlive = true;
 
+    logger.info(`New connection established. Assigned SessionID: ${ws.sessionId}`);
+
     ws.on('message', (message) => {
         try {
             const data = JSON.parse(message);
             handleMessage(ws, data);
         } catch (e) {
-            console.error('Invalid message', e);
+            logger.error(`Malformed message from ${ws.sessionId}: ${e.message}`);
         }
     });
 
@@ -44,7 +58,10 @@ wss.on('connection', (ws) => {
 // Heartbeat mechanism
 const interval = setInterval(() => {
     wss.clients.forEach((ws) => {
-        if (ws.isAlive === false) return ws.terminate();
+        if (ws.isAlive === false) {
+            logger.warn(`Terminating stale connection: ${ws.sessionId}`);
+            return ws.terminate();
+        }
         ws.isAlive = false;
         ws.ping();
     });
@@ -72,6 +89,8 @@ function handleMessage(ws, data) {
             ws.roomCode = code;
             ws.playerIndex = 1;
 
+            logger.success(`Room Created: ${code} by Player 1 (${ws.sessionId})`);
+
             ws.send(JSON.stringify({
                 type: 'room_created',
                 payload: { code, playerIndex: 1, sessionId: ws.sessionId }
@@ -83,11 +102,13 @@ function handleMessage(ws, data) {
             const { code } = payload;
             const room = rooms.get(code);
             if (!room) {
+                logger.warn(`Join Attempt Failed: Room ${code} not found. Session: ${ws.sessionId}`);
                 ws.send(JSON.stringify({ type: 'error', payload: 'Room not found' }));
                 return;
             }
 
             if (room.playerOrder.length >= 2) {
+                logger.warn(`Join Attempt Failed: Room ${code} is full. Session: ${ws.sessionId}`);
                 ws.send(JSON.stringify({ type: 'error', payload: 'Room full' }));
                 return;
             }
@@ -95,12 +116,15 @@ function handleMessage(ws, data) {
             if (room.timeoutId) {
                 clearTimeout(room.timeoutId);
                 room.timeoutId = null;
+                logger.info(`Room ${code} cleanup cancelled due to player join.`);
             }
 
             room.players.set(ws.sessionId, ws);
             room.playerOrder.push(ws.sessionId);
             ws.roomCode = code;
             ws.playerIndex = 2;
+
+            logger.success(`Player 2 (${ws.sessionId}) joined Room: ${code}`);
 
             // Notify P1 found P2
             const p1SessionId = room.playerOrder[0];
@@ -122,12 +146,14 @@ function handleMessage(ws, data) {
             const { code, sessionId } = payload;
             const room = rooms.get(code);
             if (!room) {
+                logger.warn(`Rejoin Failed: Room ${code} not found/expired. Session: ${sessionId}`);
                 ws.send(JSON.stringify({ type: 'error', payload: 'Room not found or expired' }));
                 return;
             }
 
             const playerIndex = room.playerOrder.indexOf(sessionId) + 1;
             if (playerIndex === 0) {
+                logger.warn(`Rejoin Failed: Session ${sessionId} not in Room ${code}`);
                 ws.send(JSON.stringify({ type: 'error', payload: 'Not a member of this room' }));
                 return;
             }
@@ -135,6 +161,7 @@ function handleMessage(ws, data) {
             if (room.timeoutId) {
                 clearTimeout(room.timeoutId);
                 room.timeoutId = null;
+                logger.info(`Room ${code} cleanup cancelled due to player rejoin.`);
             }
 
             // Replace old connection
@@ -142,6 +169,8 @@ function handleMessage(ws, data) {
             ws.roomCode = code;
             ws.playerIndex = playerIndex;
             room.players.set(sessionId, ws);
+
+            logger.info(`Player ${playerIndex} (${sessionId}) rejoined Room: ${code}`);
 
             ws.send(JSON.stringify({
                 type: 'game_start',
@@ -159,8 +188,6 @@ function handleMessage(ws, data) {
                     winningLine: room.gameState.winningLine
                 }
             }));
-            
-            console.log(`Player ${sessionId} rejoined room ${code}`);
             break;
         }
 
@@ -172,6 +199,14 @@ function handleMessage(ws, data) {
             const result = room.gameState.playMove(col, ws.playerIndex);
 
             if (result.valid) {
+                logger.info(`Move: Room ${ws.roomCode} | P${ws.playerIndex} dropped in col ${col}`);
+                
+                if (result.winner) {
+                    logger.success(`Game Over: Room ${ws.roomCode} | Player ${result.winner} won!`);
+                } else if (result.isDraw) {
+                    logger.info(`Game Over: Room ${ws.roomCode} | Draw`);
+                }
+
                 broadcast(room, {
                     type: 'game_state_update',
                     payload: {
@@ -180,10 +215,11 @@ function handleMessage(ws, data) {
                         winner: room.gameState.winner,
                         isGameOver: !!(room.gameState.winner || room.gameState.isDraw),
                         isDraw: room.gameState.isDraw,
-                        winningLine: result.winningLine // Add winningLine to payload
+                        winningLine: result.winningLine
                     }
                 });
             } else {
+                logger.warn(`Invalid Move Attempt: Room ${ws.roomCode} | P${ws.playerIndex} col ${col} | Reason: ${result.reason}`);
                 ws.send(JSON.stringify({ type: 'error', payload: result.reason }));
             }
             break;
@@ -195,9 +231,11 @@ function handleMessage(ws, data) {
 
             if (!room.rematchRequests.includes(ws.playerIndex)) {
                 room.rematchRequests.push(ws.playerIndex);
+                logger.info(`Rematch Requested: Room ${ws.roomCode} | P${ws.playerIndex}`);
             }
 
             if (room.rematchRequests.length === 2) {
+                logger.success(`Rematch Started: Room ${ws.roomCode}`);
                 room.gameState = new GameState();
                 room.rematchRequests = [];
 
@@ -228,6 +266,7 @@ function handleDisconnect(ws) {
         const room = rooms.get(ws.roomCode);
         if (room) {
             room.players.delete(ws.sessionId);
+            logger.info(`Player Disconnected: Room ${ws.roomCode} | P${ws.playerIndex} (${ws.sessionId})`);
 
             const connectedPlayers = Array.from(room.players.values()).filter(p => p.readyState === WebSocket.OPEN);
 
@@ -236,8 +275,9 @@ function handleDisconnect(ws) {
                 if (room.timeoutId) clearTimeout(room.timeoutId);
                 room.timeoutId = setTimeout(() => {
                     rooms.delete(ws.roomCode);
-                    console.log(`Room ${ws.roomCode} deleted due to inactivity.`);
+                    logger.info(`Room Deleted (Timeout): ${ws.roomCode}`);
                 }, ROOM_TIMEOUT);
+                logger.info(`Room Cleanup Scheduled: ${ws.roomCode} in 5 minutes.`);
             } else {
                 // Notify remaining players
                 broadcast(room, {
@@ -246,6 +286,8 @@ function handleDisconnect(ws) {
                 });
             }
         }
+    } else {
+        logger.info(`Connection Closed: ${ws.sessionId} (No room active)`);
     }
 }
 
