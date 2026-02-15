@@ -1,65 +1,13 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Connect Four 2026</title>
-</head>
-
-<body>
-  <div class="main-layout">
-    <div class="game-scene">
-      <div id="status-panel">
-        <div id="turn-indicator">Player 1's Turn</div>
-      </div>
-      <div class="board" id="board">
-        <!-- JS will generate .slot and .col-select divs here -->
-      </div>
-
-      <!-- ADD THIS BLOCK -->
-      <div id="victory-screen" class="victory-banner">
-        <h1 id="winner-text">RED WINS!</h1>
-        <button id="victory-play-again">PLAY AGAIN</button>
-      </div>
-      <!-- END OF BLOCK TO ADD -->
-      
-    </div>
-    
-    <div id="menu-overlay" class="overlay">
-      <div class="menu-content">
-        <h1>Connect Four 2026</h1>
-        <div id="main-menu">
-          <button id="btn-local">Play vs AI (Easy)</button>
-          <button id="btn-local-hard">Play vs AI (Hard)</button>
-          <button id="btn-local-pvp">Play vs Friend (Local)</button>
-          <button id="btn-online">Play Online</button>
-        </div>
-
-        <!-- ADD THIS BLOCK -->
-        <div id="online-lobby" class="hidden">
-          <h2>Online Lobby</h2>
-          <p>Connection Status: <span id="connection-status">Disconnected</span></p>
-          <button id="btn-create" disabled>Create Room</button>
-          <div class="divider">OR</div>
-          <div class="join-row">
-            <input id="input-code" placeholder="ENTER CODE" maxlength="4" disabled>
-            <button id="btn-join" disabled>Join</button>
-          </div>
-          <button id="btn-back" class="secondary">Back to Menu</button>
-        </div>
-        <!-- END OF BLOCK -->
-
-        <div id="room-wait" class="hidden">
-          <h2>Waiting for Opponent...</h2>
-          <p>Room Code: <span id="display-code" class="code-display">----</span></p>
-          <p>Share this code with your friend!</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script type="module" src="/src/main.js"></script>
-</body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connect Four 2026</title>
+  </head>
+  <body class="bg-zinc-950 text-white selection:bg-indigo-500/30">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
