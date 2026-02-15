@@ -41,7 +41,11 @@ export class Visuals {
                     else if (piecePlayer === 2) typeClass = 'yellow';
                     else if (piecePlayer === 3) typeClass = 'plant'; // The succulent player
 
-                    piece.className = `piece ${typeClass}`;
+                    // Check if this piece is part of the winning line
+                    const isWinningPiece = winningLine.some(p => p.col === c && p.row === logicalRow);
+                    const winnerClass = isWinningPiece ? ' winner' : '';
+
+                    piece.className = `piece ${typeClass}${winnerClass}`;
                     slot.appendChild(piece);
                 }
 
@@ -112,12 +116,14 @@ export class Visuals {
         // until we decide how to handle the ghost color.
     }
 
-    animateDrop(col, row) {
+    animateDrop(col, logicalRow) {
         if (this.audioManager) {
             this.audioManager.play('chip-drop');
         }
 
-        const slot = this.boardElement.querySelector(`.slot[data-col="${col}"][data-row="${row}"]`);
+        // Map logical row (0 = bottom) to visual row (0 = top)
+        const visualRow = (this.rows - 1) - logicalRow;
+        const slot = this.boardElement.querySelector(`.slot[data-col="${col}"][data-row="${visualRow}"]`);
         const piece = slot ? slot.querySelector('.piece') : null;
 
         if (piece) {

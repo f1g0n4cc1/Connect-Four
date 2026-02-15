@@ -203,8 +203,24 @@ function handleMessage(ws, data) {
                 
                 if (result.winner) {
                     logger.success(`Game Over: Room ${ws.roomCode} | Player ${result.winner} won!`);
+                    broadcast(room, {
+                        type: 'game_over',
+                        payload: {
+                            winner: result.winner,
+                            isDraw: false,
+                            winningLine: result.winningLine
+                        }
+                    });
                 } else if (result.isDraw) {
                     logger.info(`Game Over: Room ${ws.roomCode} | Draw`);
+                    broadcast(room, {
+                        type: 'game_over',
+                        payload: {
+                            winner: null,
+                            isDraw: true,
+                            winningLine: null
+                        }
+                    });
                 }
 
                 broadcast(room, {

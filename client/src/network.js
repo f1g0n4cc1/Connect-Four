@@ -104,7 +104,6 @@ export class NetworkManager {
                 if (this.callbacks.onError) this.callbacks.onError(payload)
                 break
             case 'game_over':
-                this.clearSession()
                 if (this.callbacks.onGameOver) this.callbacks.onGameOver(payload)
                 break
             case 'rematch_pending':

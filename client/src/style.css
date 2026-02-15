@@ -56,6 +56,14 @@ body {
   transform: translateZ(25px); /* REMOVED rotateZ(-90deg) */
   filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
 }
+.piece.winner {
+  box-shadow: 0 0 20px #fff, 0 0 40px #fff, 0 0 60px #fff;
+  animation: winner-glow 1s infinite alternate;
+}
+@keyframes winner-glow {
+  from { box-shadow: 0 0 10px #fff, 0 0 20px #fff; }
+  to { box-shadow: 0 0 20px #fff, 0 0 40px #fff, 0 0 60px #fff; }
+}
 .col-select {
   position: absolute;
   width: 80px;

@@ -28,16 +28,20 @@ let clientState = {
   winningLine: null,
   rematchStatus: 'none',
   connectionStatus: 'disconnected',
-  isRequestingOnlineGame: false, // Flag to manage online game requests
 }
 
 // UI Elements
 const ui = {
   overlay: document.getElementById('menu-overlay'),
   mainMenu: document.getElementById('main-menu'),
+  onlineLobby: document.getElementById('online-lobby'),
   roomWait: document.getElementById('room-wait'),
   displayCode: document.getElementById('display-code'),
-  turnIndicator: document.getElementById('turn-indicator')
+  turnIndicator: document.getElementById('turn-indicator'),
+  connectionStatus: document.getElementById('connection-status'),
+  btnCreate: document.getElementById('btn-create'),
+  btnJoin: document.getElementById('btn-join'),
+  inputCode: document.getElementById('input-code')
 }
 
 // Menu Handlers
@@ -47,16 +51,31 @@ document.getElementById('btn-local-pvp').addEventListener('click', () => { audio
 
 document.getElementById('btn-online').addEventListener('click', () => {
   audioManager.play('click');
-  clientState.isRequestingOnlineGame = true; // Set intent
+  clientState.gameMode = 'online-lobby';
   
   if (!network.ws || network.ws.readyState !== WebSocket.OPEN) {
     const url = location.hostname === 'localhost' ? 'ws://localhost:8080' : `wss://${location.host}/ws`;
     network.connect(url);
-    // The 'onConnected' handler will now create the room
-  } else {
-    // If already connected, just create the room immediately
-    network.createRoom();
   }
+  render(clientState);
+});
+
+ui.btnCreate.addEventListener('click', () => {
+  audioManager.play('click');
+  network.createRoom();
+});
+
+ui.btnJoin.addEventListener('click', () => {
+  const code = ui.inputCode.value.toUpperCase();
+  if (code.length === 4) {
+    audioManager.play('click');
+    network.joinRoom(code);
+  }
+});
+
+document.getElementById('btn-back').addEventListener('click', () => {
+  audioManager.play('click');
+  showMainMenu();
 });
 
 function render(state) {
@@ -79,13 +98,30 @@ function render(state) {
   // Manage menu visibility
   ui.overlay.style.display = 'none';
   ui.mainMenu.classList.add('hidden');
+  ui.onlineLobby.classList.add('hidden');
   ui.roomWait.classList.add('hidden');
 
   if (state.isGameOver) {
     // Game over logic is handled by handleGameOver()
-  } else if (state.gameMode === 'menu') {
+  } else {
+    document.getElementById('victory-screen').classList.remove('show');
+    const playAgainBtn = document.getElementById('victory-play-again');
+    playAgainBtn.disabled = false;
+    playAgainBtn.textContent = 'PLAY AGAIN';
+
+    if (state.gameMode === 'menu') {
+      ui.overlay.style.display = 'flex';
+      ui.mainMenu.classList.remove('hidden');
+    } else if (state.gameMode === 'online-lobby') {
     ui.overlay.style.display = 'flex';
-    ui.mainMenu.classList.remove('hidden');
+    ui.onlineLobby.classList.remove('hidden');
+    ui.connectionStatus.textContent = state.connectionStatus;
+    ui.connectionStatus.style.color = state.connectionStatus === 'connected' ? '#4caf50' : '#f44336';
+    
+    const isConnected = state.connectionStatus === 'connected';
+    ui.btnCreate.disabled = !isConnected;
+    ui.btnJoin.disabled = !isConnected;
+    ui.inputCode.disabled = !isConnected;
   } else if (state.gameMode === 'room-wait') {
     ui.overlay.style.display = 'flex';
     ui.roomWait.classList.remove('hidden');
@@ -116,11 +152,6 @@ function startGame(mode, difficulty = 'easy') {
 // --- Network Callbacks ---
 network.on('onConnected', () => {
   clientState.connectionStatus = 'connected'
-  // Only create a room if the user just clicked "Play Online"
-  if (clientState.isRequestingOnlineGame) {
-    clientState.isRequestingOnlineGame = false; // Reset the flag
-    network.createRoom();
-  }
   render(clientState)
 })
 

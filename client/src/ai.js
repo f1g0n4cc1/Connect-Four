@@ -136,12 +136,90 @@ export class AI {
 
     evaluateBoard(player) {
         let score = 0
-        // TODO: Detailed Heuristic (Center column preference, checking connected 3s, 2s)
-        // For now, simple Center Preference
+        const opponent = player === 1 ? 2 : 1
+
+        // 1. Center Column Preference
         const centerCol = Math.floor(this.board.cols / 2)
         for (let r = 0; r < this.board.rows; r++) {
             if (this.board.getPiece(centerCol, r) === player) score += 3
         }
+
+        // 2. Score Windows of 4
+        // Horizontal
+        for (let r = 0; r < this.board.rows; r++) {
+            for (let c = 0; c < this.board.cols - 3; c++) {
+                const window = [
+                    this.board.getPiece(c, r),
+                    this.board.getPiece(c + 1, r),
+                    this.board.getPiece(c + 2, r),
+                    this.board.getPiece(c + 3, r)
+                ]
+                score += this.evaluateWindow(window, player)
+            }
+        }
+
+        // Vertical
+        for (let c = 0; c < this.board.cols; c++) {
+            for (let r = 0; r < this.board.rows - 3; r++) {
+                const window = [
+                    this.board.getPiece(c, r),
+                    this.board.getPiece(c, r + 1),
+                    this.board.getPiece(c, r + 2),
+                    this.board.getPiece(c, r + 3)
+                ]
+                score += this.evaluateWindow(window, player)
+            }
+        }
+
+        // Diagonal /
+        for (let r = 0; r < this.board.rows - 3; r++) {
+            for (let c = 0; c < this.board.cols - 3; c++) {
+                const window = [
+                    this.board.getPiece(c, r),
+                    this.board.getPiece(c + 1, r + 1),
+                    this.board.getPiece(c + 2, r + 2),
+                    this.board.getPiece(c + 3, r + 3)
+                ]
+                score += this.evaluateWindow(window, player)
+            }
+        }
+
+        // Diagonal \
+        for (let r = 3; r < this.board.rows; r++) {
+            for (let c = 0; c < this.board.cols - 3; c++) {
+                const window = [
+                    this.board.getPiece(c, r),
+                    this.board.getPiece(c + 1, r - 1),
+                    this.board.getPiece(c + 2, r - 2),
+                    this.board.getPiece(c + 3, r - 3)
+                ]
+                score += this.evaluateWindow(window, player)
+            }
+        }
+
+        return score
+    }
+
+    evaluateWindow(window, player) {
+        let score = 0
+        const opponent = player === 1 ? 2 : 1
+
+        const playerCount = window.filter(p => p === player).length
+        const opponentCount = window.filter(p => p === opponent).length
+        const emptyCount = window.filter(p => p === 0).length
+
+        if (playerCount === 4) {
+            score += 1000
+        } else if (playerCount === 3 && emptyCount === 1) {
+            score += 50
+        } else if (playerCount === 2 && emptyCount === 2) {
+            score += 10
+        }
+
+        if (opponentCount === 3 && emptyCount === 1) {
+            score -= 80 // Slightly higher penalty for opponent 3-in-a-row
+        }
+
         return score
     }
 }
