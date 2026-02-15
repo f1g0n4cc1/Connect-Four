@@ -7,23 +7,25 @@ import { useGameStore } from '../../store/useGameStore';
 import { COLS, ROWS } from '@connect-four/shared';
 
 export const GameScene: React.FC = () => {
-    const { board } = useGameStore();
+    const { board, winningLine } = useGameStore();
 
     // Flatten board to a list of pieces with their positions
     const pieces = useMemo(() => {
-        const p: { player: any; x: number; y: number; id: string }[] = [];
+        const p: { player: any; x: number; y: number; id: string; isWinningPiece: boolean }[] = [];
         board.forEach((column, c) => {
             column.forEach((player, r) => {
+                const isWinningPiece = !!winningLine?.some(pos => pos.col === c && pos.row === r);
                 p.push({
                     player,
                     x: c - (COLS - 1) / 2,
                     y: r - (ROWS - 1) / 2,
-                    id: `${c}-${r}-${player}`
+                    id: `${c}-${r}`, // Stable ID
+                    isWinningPiece
                 });
             });
         });
         return p;
-    }, [board]);
+    }, [board, winningLine]);
 
     return (
         <div className="w-full h-full absolute inset-0">
@@ -52,7 +54,13 @@ export const GameScene: React.FC = () => {
                 <group rotation={[-0.1, 0.2, 0]}>
                     <Board />
                     {pieces.map(p => (
-                        <Piece key={p.id} player={p.player} x={p.x} targetY={p.y} />
+                        <Piece 
+                            key={p.id} 
+                            player={p.player} 
+                            x={p.x} 
+                            targetY={p.y} 
+                            isWinningPiece={p.isWinningPiece} 
+                        />
                     ))}
                 </group>
 
