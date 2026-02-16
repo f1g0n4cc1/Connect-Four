@@ -1,0 +1,25 @@
+services:
+  # The Game Backend (Fastify + Socket.io)
+  - type: web
+    name: connect4-backend
+    env: node
+    plan: free
+    region: ohio
+    # Build shared logic, then the server. We also run tests here for safety!
+    buildCommand: npm install && npm test && npm run build -w @connect-four/shared && npm run build -w @connect-four/server
+    startCommand: npm start -w @connect-four/server
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: connect4-redis
+          property: connectionString
+
+  # Redis for Game State Persistence
+  - type: redis
+    name: connect4-redis
+    plan: free
+    region: ohio
+    ipAllowList: [] # Only allow internal Render services to connect
