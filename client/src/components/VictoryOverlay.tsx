@@ -25,8 +25,8 @@ export const VictoryOverlay: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col items-center gap-8 bg-zinc-900/90 backdrop-blur-xl p-12 rounded-3xl border border-white/20 shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-in zoom-in duration-500">
-            <h1 className={`text-6xl font-black italic tracking-tighter ${color} drop-shadow-2xl`}>
+        <div className="flex flex-col items-center gap-8 bg-zinc-900/90 backdrop-blur-xl p-8 md:p-12 w-[min(95vw,30rem)] rounded-3xl border border-white/20 shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-in zoom-in duration-500">
+            <h1 className={`text-4xl md:text-6xl font-black italic tracking-tighter ${color} drop-shadow-2xl text-center`}>
                 {title}
             </h1>
             

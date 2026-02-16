@@ -1,10 +1,20 @@
 import React, { useMemo } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, ContactShadows } from '@react-three/drei';
 import { Board } from './Board';
 import { Piece } from './Piece';
 import { useGameStore } from '../../store/useGameStore';
 import { COLS, ROWS } from '@connect-four/shared';
+
+const CameraController = () => {
+    const { size } = useThree();
+    const isPortrait = size.width < size.height;
+    // Calculate FOV: If portrait, we need a wider lens to see the whole height
+    // Base 45, max ~75 for extreme narrow phones
+    const fov = isPortrait ? Math.min(80, 45 * (size.height / size.width) * 0.8) : 45;
+
+    return <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={fov} />;
+};
 
 export const GameScene: React.FC = () => {
     const { board, winningLine } = useGameStore();
@@ -30,7 +40,7 @@ export const GameScene: React.FC = () => {
     return (
         <div className="w-full h-full absolute inset-0">
             <Canvas shadows>
-                <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={45} />
+                <CameraController />
                 <OrbitControls 
                     enablePan={false} 
                     minDistance={5} 

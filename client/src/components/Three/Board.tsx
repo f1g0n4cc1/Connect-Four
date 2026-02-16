@@ -7,6 +7,12 @@ export const Board: React.FC = () => {
     const { makeMove } = useGameStore();
     const [hoveredCol, setHoveredCol] = useState<number | null>(null);
 
+    // Detect if the device has a touch screen (coarse pointer)
+    const isTouch = useMemo(() => {
+        if (typeof window === 'undefined') return false;
+        return window.matchMedia('(pointer: coarse)').matches;
+    }, []);
+
     const boardGeometry = useMemo(() => {
         const width = COLS;
         const height = ROWS;
@@ -66,8 +72,8 @@ export const Board: React.FC = () => {
                         e.stopPropagation();
                         makeMove(c);
                     }}
-                    onPointerOver={() => setHoveredCol(c)}
-                    onPointerOut={() => setHoveredCol(null)}
+                    onPointerOver={() => !isTouch && setHoveredCol(c)}
+                    onPointerOut={() => !isTouch && setHoveredCol(null)}
                 >
                     <boxGeometry args={[0.9, ROWS, 0.1]} />
                     <meshBasicMaterial 

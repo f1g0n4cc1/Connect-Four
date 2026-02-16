@@ -17,7 +17,7 @@ export const MainMenu: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col gap-4 w-64">
+        <div className="flex flex-col gap-4 w-[min(90vw,18rem)]">
             <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-chip-p1 to-chip-p2 bg-clip-text text-transparent">
                 Connect Four
             </h1>

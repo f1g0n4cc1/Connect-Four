@@ -8,7 +8,7 @@ export const OnlineLobby: React.FC = () => {
     const isConnected = connectionStatus === 'connected';
 
     return (
-        <div className="flex flex-col gap-6 w-80 p-8 bg-zinc-900/90 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
+        <div className="flex flex-col gap-6 w-[min(90vw,22rem)] p-8 bg-zinc-900/90 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
             <h2 className="text-2xl font-bold text-center text-white">Online Lobby</h2>
             
             <div className="flex items-center justify-center gap-2">

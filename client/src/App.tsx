@@ -5,6 +5,7 @@ import { OnlineLobby } from './components/OnlineLobby';
 import { RoomWait } from './components/RoomWait';
 import { GameScene } from './components/Three/Scene';
 import { VictoryOverlay } from './components/VictoryOverlay';
+import { FullscreenButton } from './components/FullscreenButton';
 
 const App: React.FC = () => {
     const { gameMode, setGameMode, resetLocalGame, isGameOver } = useGameStore();
@@ -34,7 +35,7 @@ const App: React.FC = () => {
 
             {/* In-Game UI Controls */}
             {!isOverlayOpen && (
-                <div className="absolute top-8 left-8 z-10">
+                <div className="absolute top-8 left-8 z-10 flex gap-4">
                     <button 
                         onClick={() => {
                             resetLocalGame();
@@ -46,6 +47,11 @@ const App: React.FC = () => {
                     </button>
                 </div>
             )}
+
+            {/* Top Right Controls (Always visible) */}
+            <div className="absolute top-8 right-8 z-10 flex gap-4">
+                <FullscreenButton />
+            </div>
 
             {/* UI Overlays */}
             {isOverlayOpen && (
