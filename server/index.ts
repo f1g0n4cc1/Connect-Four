@@ -251,10 +251,10 @@ fastify.ready(err => {
     });
 });
 
-fastify.listen({ port: 8080, host: '0.0.0.0' }, (err) => {
+fastify.listen({ port: Number(process.env.PORT) || 8080, host: '0.0.0.0' }, (err) => {
     if (err) {
         logger.error(err.message);
         process.exit(1);
     }
-    logger.success('Fastify + Socket.io Server running on port 8080');
+    logger.success(`Fastify + Socket.io Server running on port ${Number(process.env.PORT) || 8080}`);
 });

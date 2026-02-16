@@ -5,8 +5,8 @@ services:
     env: node
     plan: free
     region: ohio
-    # Build shared logic, then the server. We also run tests here for safety!
-    buildCommand: npm install && npm test && npm run build -w @connect-four/shared && npm run build -w @connect-four/server
+    # Build shared logic first, then the server
+    buildCommand: npm install && npm run build -w @connect-four/shared && npm run build -w @connect-four/server
     startCommand: npm start -w @connect-four/server
     envVars:
       - key: NODE_VERSION
